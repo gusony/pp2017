@@ -9,61 +9,71 @@
 (3)output pi estimate
 
 (4)gcc -pthread -std=gnu99 -O2 -s pic -o pi
-
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <time.h>
+
+
+
 
 typedef struct data_t{
-	long numbercircle;
-	long number_in_circle;
+	long long throw_num;
+	long long number_in_circle;
 }data_t;
 
-void *thread_Fcn(data_t *parm){
-	long toss;
-	int x,y;
-	int distance_squared;
-	
 
+void *thread_Fcn(void *parm){
+	double i;
+	double x,y;
+    long long sum=0;
+    unsigned int seed = time(NULL);
+    data_t *para = (data_t *)parm;
+    
 	srand(time(NULL));
-	for(toss=0; toss < parm->numbercircle; toss++){
-    	x = rand()%3-1;
-		y = rand()%3-1;
-		distance_squared = x * x + y * y ;
-		if ( distance_squared <= 1)
-			parm->number_in_circle ++;
+	for(i=0; i<para->throw_num; i++){
+    	x = ((rand_r(&seed)%200000)-100000)/(double)100000;
+		y = ((rand_r(&seed)%200000)-100000)/(double)100000;
+		if ( (double)(x * x + y * y) <= 1.0)
+			sum++;
     }
+    para->number_in_circle = sum;
 }
 
 int main(int argc, char *argv[]){
+    pthread_t   thread[atoi(argv[1])];
+    data_t      new[atoi(argv[1])]   ;
     
-    int toss=0;
-    int rc1=0;
-    double sum;
-    pthread_t thread_1;
-    data_t new ;
-    printf("argc=%d\n",argc);
-    printf("%s\n",argv[0]);
-    printf("%s\n",argv[1]);
-    printf("%s\n",argv[2]);
+    long long total=0;
+    time_t t1 = time(NULL);
+    int i;
+    long double pi;
 
-
-    new.numbercircle = atoi(argv[2]);
-
-	
-	rc1=pthread_create(&thread_1,NULL,thread_Fcn, &new);
-    if(rc1){
-        printf("ERROR thread create!");
+    printf("---------------------------------------------------------\nCreate thread\n");
+    for(i=0; i<atoi(argv[1]); i++){
+        new[i].throw_num = atoll(argv[2]) / atoi(argv[1]);
+        new[i].number_in_circle = 0;
+        if(pthread_create(&thread[i], NULL, thread_Fcn, (void *) &new[i])) //success will return 0
+            printf("ERROR:thread create!\n");
     }
     
-    rc1=pthread_join(thread_1,NULL);
-    sum = 4* new.number_in_circle /(( double ) new.numbercircle ) ;
-    printf("sum=%.8f\n",sum);
+    
+    printf("Wait join\n");
+    for(i=0; i<atoi(argv[1]); i++){
+        if(pthread_join(thread[i],NULL))//success will return 0
+            printf("ERROR:join error\n");
+        total += new[i].number_in_circle;
+    }
+    
+    //printf("total.number_in_circle=%lld\n",total);
+    pi = 4* total /(( long double ) atoll(argv[2]) ) ;
+    printf("use %lld sec\n",(long long)time(NULL)-t1);
+    printf("pi=%ll\n",pi);
     printf("exit\n");
-
+    printf("---------------------------------------------------------\n");
     return 0;
 
     
