@@ -17,8 +17,7 @@
 #include <unistd.h>
 #include <time.h>
 
-
-
+#define MAX_THREAD_NUM 32
 
 typedef struct data_t{
 	long long throw_num;
@@ -43,41 +42,43 @@ void *thread_Fcn(void *parm){
     para->number_in_circle = sum;
 }
 
+void exe(int thread_num, long double run_times){
+    pthread_t   thread[MAX_THREAD_NUM];
+    data_t      new[MAX_THREAD_NUM];
+    long long   total = 0;
+    long double pi = 0.0;
+    int i;
+    time_t t_start, t_end;
+    
+    t_start = clock();
+    for(i=0; i<thread_num; i++){
+        new[i].throw_num = run_times / thread_num;
+        new[i].number_in_circle = 0;
+        if(pthread_create(&thread[i], NULL, thread_Fcn, (void *) &new[i])) //success will return 0
+            printf("ERROR:thread create!\n");
+    }
+    for(i=0; i<thread_num; i++){
+        if(pthread_join(thread[i],NULL))//success will return 0
+            printf("ERROR:join error\n");
+        total += new[i].number_in_circle;
+    }
+    t_end=clock();
+    pi = 4* total /( long double )run_times ;
+    printf("use %f sec\n",(t_end - t_start)/(double)CLOCKS_PER_SEC);
+    printf("pi=%Lf\n\n",pi);
+}
+
 int main(int argc, char *argv[]){
 	if(argc !=3 ){ 
     	printf("parameter error:\"<./pi> <cpu_number> <run_times>\"\n");
     	return(0);
     }
-    
-    pthread_t   thread[atoi(argv[1])];
-    data_t      new[atoi(argv[1])];
-    long long   total = 0;
-    long double pi = 0.0;
-    
-    time_t t1 = time(NULL);
-    int i;
-    
-    //printf("---------------------------------------------------------\nCreate thread\n");
-    for(i=0; i<atoi(argv[1]); i++){
-        new[i].throw_num = atoll(argv[2]) / atoi(argv[1]);
-        new[i].number_in_circle = 0;
-        if(pthread_create(&thread[i], NULL, thread_Fcn, (void *) &new[i])) //success will return 0
-            printf("ERROR:thread create!\n");
-    }
-    
-    //printf("Wait join\n");
-    for(i=0; i<atoi(argv[1]); i++){
-        if(pthread_join(thread[i],NULL))//success will return 0
-            printf("ERROR:join error\n");
-        total += new[i].number_in_circle;
-    }
-    
-    
-    pi = 4* total /(( long double ) atoll(argv[2]) ) ;
-    //printf("use %lld sec\n",(long long)time(NULL)-t1);
-    printf("pi=%Lf\n",pi);
-    //printf("exit\n");
-    //printf("---------------------------------------------------------\n");
+    exe(1,atoll(argv[2]));
+    exe(2,atoll(argv[2]));
+    exe(4,atoll(argv[2]));
+    exe(8,atoll(argv[2]));
+    exe(16,atoll(argv[2]));
+    exe(32,atoll(argv[2]));
     return 0;
 
     
