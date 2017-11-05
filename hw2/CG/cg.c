@@ -5,7 +5,7 @@
 #include "globals.h"
 #include "randdp.h"
 #include "timers.h"
-
+  
 //---------------------------------------------------------------------
 /* common / main_int_mem / */
 static int colidx[NZ];
