@@ -92,6 +92,7 @@ int main(int argc, char *argv[])
   double norm_temp1, norm_temp2;
 
   double t, mflops, tmax;
+  
   //char Class;
   logical verified;
   double zeta_verify_value, epsilon, err;
@@ -162,9 +163,8 @@ int main(int argc, char *argv[])
     r[j] = 0.0;
     p[j] = 0.0;
   }
-
   zeta = 0.0;
-
+  
   //---------------------------------------------------------------------
   //---->
   // Do one iteration untimed to init all code and data page tables
@@ -320,9 +320,13 @@ static void conj_grad(int colidx[],
   // rho = r.r
   // Now, obtain the norm of r: First, sum squares of r elements locally...
   //---------------------------------------------------------------------
+  time_t t_start = clock();
+  #pragma omp parallel for
   for (j = 0; j < lastcol - firstcol + 1; j++) {
     rho = rho + r[j]*r[j];
   }
+  time_t t_end = clock();
+  printf("---%d---\n",(int)t_end-t_start);
 
   //---------------------------------------------------------------------
   //---->
