@@ -1,6 +1,8 @@
+#include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+
 
 int isprime(int n) {
   int i,squareroot;
