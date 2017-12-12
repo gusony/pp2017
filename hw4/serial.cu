@@ -62,6 +62,7 @@ void init_line(void)
 {
    int i, j;
    float x, fac, k, tmp;
+   time_t start = clock();
 
    /* Calculate initial values based on sine curve */
    fac = 2.0 * PI;
@@ -76,6 +77,8 @@ void init_line(void)
    /* Initialize old values array */
    for (i = 1; i <= tpoints; i++)
       oldval[i] = values[i];
+
+   printf("init_line:%ld\n",clock() - start);
 }
 
 /**********************************************************************

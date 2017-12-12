@@ -14,6 +14,7 @@
 #define PI 3.14159265
 #define sqtau (1.0 * 0.3 / 1.0)*(1.0 * 0.3 / 1.0)
 
+
 void check_param(void);
 void init_line(void);
 void update (void);
@@ -61,22 +62,22 @@ void check_param(void)
  *********************************************************************/
 void init_line(void)
 {
-   int i, j;
+   int j;
    float x, fac, k, tmp;
+   time_t start = clock();
 
    /* Calculate initial values based on sine curve */
    fac = 2.0 * PI;
    k = 0.0;
    tmp = tpoints - 1;
+
    for (j = 1; j <= tpoints; j++) {
       x = k/tmp;
       values[j] = sin (fac * x);
+      oldval[j] = values[j];
       k = k + 1.0;
    }
-
-   /* Initialize old values array */
-   for (i = 1; i <= tpoints; i++)
-      oldval[i] = values[i];
+   printf("init_line:%ld\n",clock() - start);
 }
 
 /**********************************************************************
@@ -161,7 +162,7 @@ int main(int argc, char *argv[])
    printf("Updating all points for all time steps...\n");
    update();
    printf("Printing final results...\n");
-   printfinal();
+   //printfinal();
    printf("\nDone.\n\n");
 
    return 0;
