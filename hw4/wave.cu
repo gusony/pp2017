@@ -20,7 +20,7 @@ void update (void);
 void printfinal (void);
 
 int nsteps,                   /* number of time steps */
-    tpoints,            /* total points along string */
+    tpoints,                  /* total points along string */
     rcode;                    /* generic return code */
 float  values[MAXPOINTS+2],   /* values at time t */
        oldval[MAXPOINTS+2],   /* values at time (t-dt) */
@@ -99,34 +99,12 @@ __global__ void g_do_math(float *values, float *oldval, float *newval,int nsteps
 	int i = 0;
 	int j = blockIdx.x*32 + threadIdx.x;
 
-/*
-for (i = 1; i<= nsteps; i++) {
-  // Update points along line for this time step
-  for (j = 1; j <= tpoints; j++) {
-     // global endpoints
-     if ((j == 1) || (j  == tpoints))
-        newval[j] = 0.0;
-     else
-        do_math(j);
-  }
-
-  // Update old values with new values
-  for (j = 1; j <= tpoints; j++) {
-     oldval[j] = values[j];
-     values[j] = newval[j];
-  }
-}
-*/
-
-	/* Update values for each time step */
 	for (i = 1; i<= nsteps; i++) {
 		*(newval+1) = *(newval+tpoints) = 0.0;
-
 		*(newval+j) = (2.0 * (*(values+j)) ) - (*(oldval+j)) + (sqtau *  (-2.0)* (*(values+j)) );
 
 		*(oldval+j) = *(values+j);
 		*(values+j) = *(newval+j);
-
 	}
 }
 
@@ -135,12 +113,11 @@ for (i = 1; i<= nsteps; i++) {
  *********************************************************************/
 void update()
 {
-   	//int i, j;
    	int blocknum = ((int)(tpoints/32))+1;
 
     float *d_values, *d_oldval, *d_newval;
     cudaMalloc((void**)&d_values, sizeof(float) * (MAXPOINTS+2)); // values at time t
-    cudaMalloc((void**)&d_oldval, sizeof(float) * (MAXPOINTS+2));	// values at time (t-dt)
+    cudaMalloc((void**)&d_oldval, sizeof(float) * (MAXPOINTS+2)); // values at time (t-dt)
     cudaMalloc((void**)&d_newval, sizeof(float) * (MAXPOINTS+2)); // values at time (t+dt)
 
     cudaMemcpy(d_values, &values[0], sizeof(float) * MAXPOINTS+2, cudaMemcpyHostToDevice);
