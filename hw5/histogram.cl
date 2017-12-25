@@ -1,19 +1,19 @@
-#include "stdio.h"
-#include "stdlib.h"
-#include "string.h"
-#include <fstream>
-#include <iostream>
+__kernel void image(__global unsigned int *T_mem_obj, __global unsigned int *R_mem_obj, __global unsigned int *G_mem_obj, __global unsigned int *B_mem_obj){
+	const unsigned int idx = get_global_id(0);
+	if(idx < 10)
+		printf("%d:%d\n",idx,*T_mem_obj+idx);
 
-#include <CL/cl.h>
-#include <vector>
+	switch (idx mod 3){
+		case 0:
+			R_mem_obj[*T_mem_obj+idx]++;
+			break;
 
-int main(int argc, char* argv[]){
-cl_int error;
+		case 1:
+			G_mem_obj[*T_mem_obj+idx]++;
+			break;
 
-    //Setup Platform
-    cl_uint testPlatformCount;
-    error = clGetPlatformIDs(0, NULL, &testPlatformCount);
-    printf("%d\n",error);
-
-    return(0);
+		case 2:
+			B_mem_obj[*T_mem_obj+idx]++;
+			break;
+	}
 }

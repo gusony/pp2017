@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 int main (int argc, char *argv[]){
-    long pixel=4096*3112;
+    long pixel=1920*1080;
 
     FILE *output = fopen("input","w");
     fprintf(output, "%ld\n",pixel*3);
