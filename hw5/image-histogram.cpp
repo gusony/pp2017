@@ -3,7 +3,14 @@
 #include "string.h"
 #include <fstream>
 #include <iostream>
+#include <CL/cl.h>
 
+
+__kernel void adder(__global const float* a, __global const float* b, __global float* result)
+{
+	int idx = get_global_id(0);
+	result[idx] = a[idx] + b[idx];
+}
 unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 
 	unsigned int *img = image_data;
@@ -42,10 +49,14 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 
 int main(int argc, char const *argv[])
 {
+	cl_int err,ciErrNum;
+    cl_uint num,*device,*num_devices;
+	cl_context myctx = clCreateContextFromType(0, CL_DEVICE_TYPE_GPU, NULL, NULL, &ciErrNum);
+	ciErrNum = clGetDeviceIDs(0, CL_DEVICE_TYPE_GPU, 1, &device, num_devices);
 
 	unsigned int * histogram_results;
 	unsigned int i=0, a, input_size;
-	std::fstream inFile("input.jpg", std::ios_base::in);
+	std::fstream inFile("input", std::ios_base::in);
 	std::ofstream outFile("0646001.out", std::ios_base::out);
 
 	inFile >> input_size;
