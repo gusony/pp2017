@@ -4,7 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <CL/cl.h>
-
+  
 
 __kernel void adder(__global const float* a, __global const float* b, __global float* result)
 {
