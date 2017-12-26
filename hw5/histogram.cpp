@@ -209,7 +209,6 @@ int main(int argc, char const *argv[])
             outFile << std::endl;
         outFile << histogram_results[i]<< ' ';
     }
-    outFile << "\n";
 
 
     inFile.close();
